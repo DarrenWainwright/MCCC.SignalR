@@ -4,6 +4,8 @@ namespace MCCC_SignalR.Model
 {
     public class Heartbeat
     {
+        [JsonProperty("id")]
+        public string Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("type")]
@@ -11,8 +13,9 @@ namespace MCCC_SignalR.Model
         [JsonProperty("heartbeatInterval")]
         public int HeartbeatInterval { get; set; }
 
-        public Heartbeat(string name, string type, int heartbeatInterval)
+        public Heartbeat(string id, string name, string type, int heartbeatInterval)
         {
+            Id = id;
             Name = name;
             Type = type;
             HeartbeatInterval = heartbeatInterval;
