@@ -16,7 +16,7 @@ namespace MCCC_SignalR
             collectionName: "Sensor",
             ConnectionStringSetting = "AzureCosmosUrl",
             LeaseCollectionName = "leases", CreateLeaseCollectionIfNotExists =true)]IReadOnlyList<Document> sensors, ILogger log,
-            [SignalR(HubName = "mccc-sensor-hub")] IAsyncCollector<SignalRMessage> signalRMessages)
+            [SignalR(HubName = "mccc")] IAsyncCollector<SignalRMessage> signalRMessages)
         {
 
             foreach (var sensor in sensors)
