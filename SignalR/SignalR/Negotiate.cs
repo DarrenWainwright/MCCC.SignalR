@@ -15,8 +15,12 @@ namespace SignalR
             [SignalRConnectionInfo(HubName = "mccc")] SignalRConnectionInfo connectionInfo,
             ILogger log)
         {
+
+
+            //TODO.. secure this..
+
+            log.LogInformation("Incoming connection request. SignalR Negotiation started");
             return connectionInfo;
-            //return new OkObjectResult(connectionInfo);
         }
 
     }
