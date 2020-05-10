@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.Extensions.Logging;
 
 namespace SignalR
 {
-    public static class TemperatureChanged
+    public static class SensorDataChanged
     {
-        [FunctionName(nameof(TemperatureChanged))]
+        [FunctionName(nameof(SensorDataChanged))]
         public static void Run([CosmosDBTrigger(databaseName: "MotherCluckers",
             collectionName: "SensorData",
             ConnectionStringSetting = "AzureCosmosUrl",
@@ -21,34 +20,38 @@ namespace SignalR
             [SignalR(HubName = "mccc")] IAsyncCollector<SignalRMessage> signalRMessages)
         {
             log.LogInformation("TemperatureChanged SignalR function started");
-            /// Not filtering any of the SensorData docuemnts here.
-            /// Event Grid will filter traffic to this function
 
-            input.Where(p => !p.GetPropertyValue<double>("celcius").IsNull()).ToList().ForEach(inp =>
+            input.ToList().ForEach(inp =>
             {
                 try
                 {
                     log.LogInformation("Attempt to create obj");
 
+
+                    var c = inp.GetPropertyValue<double>("celcius");
+                    var f = inp.GetPropertyValue<double>("fahrenheit");
+                    var h = inp.GetPropertyValue<double>("humidity");
                     dynamic model = new ExpandoObject();
-                    model.sensorName = inp.GetPropertyValue<string>("name");
-                    model.celcius = inp.GetPropertyValue<double>("celcius");
-                    model.heartbeatInterval = inp.GetPropertyValue<double>("fahrenheit");
+                    model.name = inp.GetPropertyValue<string>("name");
+                    if (c != 0)
+                        model.celcius = c;
+                    if (f != 0)
+                        model.fahrenheit = f;
+                    if (h != 0)
+                        model.humidity = h;
 
 
                     signalRMessages.AddAsync(new SignalRMessage
                     {
-                        Target = "onTemperatureChanged",
+                        Target = "onSensorDataChanged",
                         Arguments = new[] { model }
                     });
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
-
-                    throw new InvalidOperationException("Could not send message.", ex);
+                    //TODO .. finish this..
+                    log.LogError(ex, ex.Message);
                 }
-
-
             });
 
 
